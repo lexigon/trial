@@ -4,4 +4,4 @@ Execution.txt : implementation of the trading strategy for the chosen assets dur
 
 Ex+Class.txt : codes from Assets.txt and Execution.txt combined.
 
-Results.txt : results for 2014-02::2015-02, 2015-02::2016-02, 2016-02::2017-02, 2017-02::2018-02.
+Results.txt : results for 2013-02::2014-02, 2014-02::2015-02, 2015-02::2016-02, 2016-02::2017-02, 2017-02::2018-02.
