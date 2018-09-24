@@ -1,0 +1,909 @@
+#################SymbolsUUU1 is the class of assets for a given month. Each month is determined by a pair (i*, m*), where i* \in {0, 1, 2, 3}, m* \in {1, w1, 2*w1}.
+#################For example, March is given by (0, 2*w1).
+
+for (y in SymbolsUUU1) {
+
+##############################
+xxxx2 <- eval(parse(text = y))   #read in OLHCV data for y.
+
+#xxxx2 <- xxxx2[PerfIndex[(st1+1+i*tw):(st1+1+i*tw+tw-1)]]
+
+xxxx2 <- xxxx2[PerfIndex[(st1+1+i*tw-(P+1)+m*pp11-1):(st1+1+i*tw+m*pp11-1)]]
+
+ppp <- 26
+xxxx <- xxxx2[1]
+for (o in 1:(nrow(xxxx2)/pp11)) {
+xxxx <- rbind(xxxx, xxxx2[pp11*o])
+} #Factor data with step pp11.
+
+xxxx$PriceCl <- Cl(xxxx)
+xxxx$Returns <- diff(xxxx$PriceCl)
+
+
+xxxxd <- xxxx2[1]
+for (o in 1:(nrow(xxxx2)/ppp)) {
+xxxxd <- rbind(xxxxd, xxxx2[ppp*o])
+}  #Getting daily data.
+
+xxxxd$PriceCl <- Cl(xxxxd)
+xxxxd$ReturnsD <- diff(xxxxd$PriceCl)
+
+
+xxxxyy <- Cl(xxxx2[1])
+for (o in 1:(nrow(xxxx2)/pp11)) {
+xxyy1 <- xts(x = sum(Cl(xxxx2[(pp11*(o-1)+1):(pp11*o)]))/pp11, order.by = index(Cl(xxxx2[pp11*o])))
+names(xxyy1) <- "close"
+xxxxyy <- rbind(xxxxyy, xxyy1)
+}  #Getting pp11-factored data and taking average over the period of length pp11.
+
+xxxx$PriceClMean <- xxxxyy
+xxxx$ReturnsMean <- diff(xxxx$PriceClMean)
+xxxx$Returns[1] <- xxxx$ReturnsMean[1] <- xxxxd$ReturnsD[1] <- 0
+
+xxyy1 <- eval(parse(text = paste(y, 'fd', sep = '')))
+starts <- strptime(PerfIndex[1], "%Y-%m-%d")
+ends <- crnt_time <- strptime(PerfIndex[(st1+1+i*tw+m*pp11-1)], "%Y-%m-%d")
+xxyy1 <- xxyy1[paste(starts, "::", ends, sep = "")]
+dfrnc_time <- as.numeric(crnt_time-index(xxyy1[nrow(xxyy1)]))
+
+xxxxdl <- Cl(xxxx2[1])
+for (o in 1:(nrow(xxxx2)/6)) {
+xxyy1 <- xts(x = sum(Cl(xxxx2[(6*(o-1)+1):(6*o)]))/6, order.by = index(Cl(xxxx2[6*o])))
+names(xxyy1) <- "close"
+xxxxdl <- rbind(xxxxdl, xxyy1)
+}
+
+xxxxdl$PriceClMean <- xxxxdl
+xxxxdl$ReturnsDlMean <- diff(xxxxdl$PriceClMean)
+xxxxdl$ReturnsDlMean[1] <- 0
+
+xxxx2$PriceCl <- Cl(xxxx2)
+xxxx2$ReturnsD <- diff(xxxx2$PriceCl)
+xxxx2$ReturnsD[1] <- 0
+
+
+
+#Now data has been read in, execution of the strategy begins. Data processed step by step as m ranges over 1:floor(tw/pp11).
+#First month is given by m in [1,w1], z = 0, second one by m in [w1,2*w1], z = 1, third one by m in [2*w1, floor(tw)/pp11], z = 2. We defined w1 to be 67.
+
+
+if ( m != 1 && m != 67 && m != 134 && m != floor(tw/pp11)) {
+
+starts <- strptime(PerfIndex[(st1+1+i*tw+1*pp11-1)], "%Y-%m-%d")
+crnt_time <- strptime(PerfIndex[(st1+1+i*tw+m*pp11-1)], "%Y-%m-%d")
+dfrnc_intime0 <- as.numeric(crnt_time-starts)
+dfrnc_intime0 <- 0
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) <= 50) {
+
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= 17) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-14):nrow(xxxx)]) > 0.33  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+
+if ( dfrnc_intime0 < 18 && nrow(xx21) >= 25 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-23):(nrow(xxxx)-12)]) < -0.5) && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+
+if ( sum(xxxx2$ReturnsD[PerfIndex[(st1+1+i*tw+m*pp11-1):(st1+1+i*tw+m*pp11-4)]]) < -0.4 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-6):nrow(xxxxdl)]) < -0.34 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-23):(nrow(xxxx)-12)]) > 0.7 && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) < -0.4 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+} else {
+
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= 3.5 && unclass(xxxx$PriceCl[nrow(xxxx)]) < 7) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-7):nrow(xxxx)]) > 0.2  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+
+if ( dfrnc_intime0 < 18 && nrow(xx21) >= 25 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) > 0.15 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-11):(nrow(xxxx)-6)]) < -0.25) && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-5):nrow(xxxx)]) > 0.17 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+if ( sum(xxxx2$ReturnsD[PerfIndex[(st1+1+i*tw+m*pp11-1):(st1+1+i*tw+m*pp11-4)]]) < -0.2 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-3):nrow(xxxxdl)]) < -0.18 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-11):(nrow(xxxx)-6)]) > 0.35 && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) < -0.21 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+}
+}
+} else {}
+
+} else {}
+
+
+
+} #  end of if (z == 0)
+
+############################
+############################
+if (z == 0 && length(xxxx$PriceCl[nrow(xxxx)]) > 0) {
+
+xx21 <- Frame[paste(PerfIndex[(st1+1+i*tw+1*pp11-1)], "::", index(xxxx2$PriceCl[nrow(xxxx2)]), sep = ""), y == colnames(Frame)]
+
+
+
+if ( m != 1 && m != 67 && m != 134 && m != floor(tw/pp11)) {
+
+starts <- strptime(PerfIndex[(st1+1+i*tw+1*pp11-1)], "%Y-%m-%d")
+crnt_time <- strptime(PerfIndex[(st1+1+i*tw+m*pp11-1)], "%Y-%m-%d")
+dfrnc_intime0 <- as.numeric(crnt_time-starts)
+dfrnc_intime0 <- 0
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) <= 50) {
+
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= 7 && unclass(xxxx$PriceCl[nrow(xxxx)]) < 17) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-14):nrow(xxxx)]) > 0.33  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+
+if ( dfrnc_intime0 < 18 && nrow(xx21) >= 25 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-23):(nrow(xxxx)-12)]) < -0.5) && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+if ( sum(xxxx2$ReturnsD[PerfIndex[(st1+1+i*tw+m*pp11-1):(st1+1+i*tw+m*pp11-4)]]) < -0.4 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-6):nrow(xxxxdl)]) < -0.34 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-23):(nrow(xxxx)-12)]) > 0.7 && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) < -0.4 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+} else {
+
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= -3.5 && unclass(xxxx$PriceCl[nrow(xxxx)]) < 0) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx[nrow(xxxx)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-7):nrow(xxxx)]) > 0.2  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+if ( dfrnc_intime0 < 18 && nrow(xx21) >= 25 && (index(xxxx[nrow(xxxx)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) > 0.15 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-11):(nrow(xxxx)-6)]) < -0.25) && (index(xxxx[nrow(xxxx)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-5):nrow(xxxx)]) > 0.17 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-3):nrow(xxxxdl)]) < -0.18 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-11):(nrow(xxxx)-6)]) > 0.35 && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) < -0.21 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+}
+}
+} else {}
+
+} else {}
+
+
+
+} #  end of if (z == 0)
+
+
+############################
+############################
+
+
+if (z == 1 && length(xxxx$PriceCl[nrow(xxxx)]) > 0) {
+
+xx21 <- Frame[paste(PerfIndex[(st1+1+i*tw+67*pp11-1)], "::", index(xxxx2$PriceCl[nrow(xxxx2)]), sep = ""), y == colnames(Frame)]
+
+
+if ( m != 1 && m != 67 && m != 134 && m != floor(tw/pp11)) {
+
+starts <- strptime(PerfIndex[(st1+1+i*tw+67*pp11-1)], "%Y-%m-%d")
+crnt_time <- strptime(PerfIndex[(st1+1+i*tw+m*pp11-1)], "%Y-%m-%d")
+dfrnc_intime0 <- as.numeric(crnt_time-starts)
+dfrnc_intime0 <- 0
+
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) <= 50) {
+
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= 17) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-14):nrow(xxxx)]) > 0.33  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+if ( dfrnc_intime0 < 18 && nrow(xx21) >= 25 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-23):(nrow(xxxx)-12)]) < -0.5) && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+if ( sum(xxxx2$ReturnsD[PerfIndex[(st1+1+i*tw+m*pp11-1):(st1+1+i*tw+m*pp11-4)]]) < -0.4 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-6):nrow(xxxxdl)]) < -0.34 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-23):(nrow(xxxx)-12)]) > 0.7 && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) < -0.4 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+} else {
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= 3.5 && unclass(xxxx$PriceCl[nrow(xxxx)]) < 7) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-7):nrow(xxxx)]) > 0.2  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+if ( dfrnc_intime0 < 18 && nrow(xx21) >= 25 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) > 0.15 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-11):(nrow(xxxx)-6)]) < -0.25) && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-5):nrow(xxxx)]) > 0.17 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+if ( sum(xxxx2$ReturnsD[PerfIndex[(st1+1+i*tw+m*pp11-1):(st1+1+i*tw+m*pp11-4)]]) < -0.2 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-3):nrow(xxxxdl)]) < -0.18 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-11):(nrow(xxxx)-6)]) > 0.35 && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) < -0.21 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+}
+}
+} else {}
+
+} else {}
+
+
+
+} #  end of if (z == 1)
+
+##################
+##################
+if (z == 1 && length(xxxx$PriceCl[nrow(xxxx)]) > 0) {
+
+xx21 <- Frame[paste(PerfIndex[(st1+1+i*tw+67*pp11-1)], "::", index(xxxx2$PriceCl[nrow(xxxx2)]), sep = ""), y == colnames(Frame)]
+
+
+if ( m != 1 && m != 67 && m != 134 && m != floor(tw/pp11)) {
+
+starts <- strptime(PerfIndex[(st1+1+i*tw+67*pp11-1)], "%Y-%m-%d")
+crnt_time <- strptime(PerfIndex[(st1+1+i*tw+m*pp11-1)], "%Y-%m-%d")
+dfrnc_intime0 <- as.numeric(crnt_time-starts)
+dfrnc_intime0 <- 0
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) <= 50) {
+
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= 7 && unclass(xxxx$PriceCl[nrow(xxxx)]) < 17) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-14):nrow(xxxx)]) > 0.33  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+if ( dfrnc_intime0 < 18 && nrow(xx21) >= 25 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-23):(nrow(xxxx)-12)]) < -0.5) && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*0.85)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+if ( sum(xxxx2$ReturnsD[PerfIndex[(st1+1+i*tw+m*pp11-1):(st1+1+i*tw+m*pp11-4)]]) < -0.4 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-6):nrow(xxxxdl)]) < -0.34 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-23):(nrow(xxxx)-12)]) > 0.7 && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) < -0.4 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+} else {
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= -3.5 && unclass(xxxx$PriceCl[nrow(xxxx)]) < 0) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*4/5)]) && sum(xxxx$Returns[(nrow(xxxx)-7):nrow(xxxx)]) > 0.2  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*4/5)]) && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) > 0.15 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-11):(nrow(xxxx)-6)]) < -0.25) && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*4/5)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-5):nrow(xxxx)]) > 0.17 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-3):nrow(xxxxdl)]) < -0.18 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-11):(nrow(xxxx)-6)]) > 0.35 && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) < -0.21 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+}
+}
+} else {}
+
+} else {}
+
+
+
+} #  end of if (z == 1)
+
+##################
+##################
+
+
+if (z == 2 && length(xxxx$PriceCl[nrow(xxxx)]) > 0) {
+
+xx21 <- Frame[paste(PerfIndex[(st1+1+i*tw+134*pp11-1)], "::", index(xxxx2$PriceCl[nrow(xxxx2)]), sep = ""), y == colnames(Frame)]
+if (i == 0 | i == 1) {tr1 <- 0.85}
+if (i == 2 | i == 3) {tr1 <- 0.9}
+
+
+
+if ( m != 1 && m != 67 && m != 134 && m != floor(tw/pp11)) {
+
+starts <- strptime(PerfIndex[(st1+1+i*tw+134*pp11-1)], "%Y-%m-%d")
+crnt_time <- strptime(PerfIndex[(st1+1+i*tw+m*pp11-1)], "%Y-%m-%d")
+dfrnc_intime0 <- as.numeric(crnt_time-starts)
+dfrnc_intime0 <- 0
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) <= 50) {
+
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= 17) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*tr1)]) && sum(xxxx$Returns[(nrow(xxxx)-14):nrow(xxxx)]) > 0.33  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+if ( dfrnc_intime0 < 18 && nrow(xx21) >= 25 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*tr1)]) && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-23):(nrow(xxxx)-12)]) < -0.5) && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*tr1)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+if ( sum(xxxx2$ReturnsD[PerfIndex[(st1+1+i*tw+m*pp11-1):(st1+1+i*tw+m*pp11-4)]]) < -0.4 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-6):nrow(xxxxdl)]) < -0.34 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-23):(nrow(xxxx)-12)]) > 0.7 && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) < -0.4 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+} else {
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= 3.5 && unclass(xxxx$PriceCl[nrow(xxxx)]) < 7) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*tr1)]) && sum(xxxx$Returns[(nrow(xxxx)-7):nrow(xxxx)]) > 0.2  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+
+if ( dfrnc_intime0 < 18 && nrow(xx21) >= 25 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*tr1)]) && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) > 0.15 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-11):(nrow(xxxx)-6)]) < -0.25) && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*tr1)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-5):nrow(xxxx)]) > 0.17 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+
+if ( sum(xxxx2$ReturnsD[PerfIndex[(st1+1+i*tw+m*pp11-1):(st1+1+i*tw+m*pp11-4)]]) < -0.2 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-3):nrow(xxxxdl)]) < -0.18 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-11):(nrow(xxxx)-6)]) > 0.35 && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) < -0.21 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+}
+}
+} else {}
+
+} else {}
+
+
+
+} #  end of if (z == 2)
+
+###############################
+###############################
+if (z == 2 && length(xxxx$PriceCl[nrow(xxxx)]) > 0) {
+
+xx21 <- Frame[paste(PerfIndex[(st1+1+i*tw+134*pp11-1)], "::", index(xxxx2$PriceCl[nrow(xxxx2)]), sep = ""), y == colnames(Frame)]
+if (i == 0 | i == 1) {tr1 <- 0.85}
+if (i == 2 | i == 3) {tr1 <- 0.9}
+
+
+
+if ( m != 1 && m != 67 && m != 134 && m != floor(tw/pp11)) {
+
+starts <- strptime(PerfIndex[(st1+1+i*tw+134*pp11-1)], "%Y-%m-%d")
+crnt_time <- strptime(PerfIndex[(st1+1+i*tw+m*pp11-1)], "%Y-%m-%d")
+dfrnc_intime0 <- as.numeric(crnt_time-starts)
+dfrnc_intime0 <- 0
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) <= 50) {
+
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= 7 && unclass(xxxx$PriceCl[nrow(xxxx)]) < 17) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+
+if ( dfrnc_intime0 < 18 &&  (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*tr1)]) && sum(xxxx$Returns[(nrow(xxxx)-14):nrow(xxxx)]) > 0.33  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+
+if ( dfrnc_intime0 < 18 && nrow(xx21) >= 25 && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*tr1)]) && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-23):(nrow(xxxx)-12)]) < -0.5) && (index(xxxx2[nrow(xxxx2)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*tr1)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-11):nrow(xxxx)]) > 0.3 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+
+if ( sum(xxxx2$ReturnsD[PerfIndex[(st1+1+i*tw+m*pp11-1):(st1+1+i*tw+m*pp11-4)]]) < -0.4 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-6):nrow(xxxxdl)]) < -0.34 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-23):(nrow(xxxx)-12)]) > 0.7 && sum(xxxx$Returns[(nrow(xxxx)-11):nrow(xxxx)]) < -0.4 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+} else {
+
+if (unclass(xxxx$PriceCl[nrow(xxxx)]) >= -3.5 && unclass(xxxx$PriceCl[nrow(xxxx)]) < 0) {
+
+if (length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 2 | length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 4) {
+
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx[nrow(xxxx)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*4/5)]) && sum(xxxx$Returns[(nrow(xxxx)-7):nrow(xxxx)]) > 0.2  ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])}
+} else {
+
+
+
+if ( dfrnc_intime0 < 18 && (index(xxxx[nrow(xxxx)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*4/5)]) && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) > 0.15 && length(Frame[,y][Frame[,y] != 0][PerfIndex[(st1+i*tw+1+z*67*pp11):(st1+1+i*tw+m*pp11-1)]]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+if ( dfrnc_intime0 < 18 && (sum(xxxx$ReturnsMean[(nrow(xxxx)-11):(nrow(xxxx)-6)]) < -0.25) && (index(xxxx[nrow(xxxx)]) < PerfIndex[(st1+1+i*tw+(1+z)*67*pp11*4/5)]) && sum(xxxx$ReturnsMean[(nrow(xxxx)-5):nrow(xxxx)]) > 0.17 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 0 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- 1
+xx111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(xx111) == y] <- unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])])} else {
+
+
+
+if ( dfrnc_intime0 != 18 && sum(xxxxdl$ReturnsDlMean[(nrow(xxxxdl)-3):nrow(xxxxdl)]) < -0.18 && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) > (xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1
+yy111[(st1+i*tw+1+m*pp11-1)  %%  (st1+i*tw+1), colnames(yy111) == y] <- 1
+}
+
+if ( sum(xxxx$Returns[(nrow(xxxx)-11):(nrow(xxxx)-6)]) > 0.35 && sum(xxxx$Returns[(nrow(xxxx)-5):nrow(xxxx)]) < -0.21 && unclass(xxxx$PriceCl[index(xxxx$PriceCl[nrow(xxxx)])]) >= 1.008*(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0][length(xx111[,colnames(xx111) == y][xx111[,colnames(xx111) == y] != 0])]) && sum(Frame[paste(PerfIndex[(st1+i*tw+1+z*67*pp11)], "::", index(xxxx$PriceCl[nrow(xxxx)]), sep = ""), y == colnames(Frame)]) == 1 ) {
+Frame[index(xxxx$PriceCl[nrow(xxxx)]), y == colnames(Frame)] <- -1}
+}
+}
+}
+}
+}
+} else {}
+
+} else {}
+
+
+
+} #  end of if (z == 2)
+
+
+###############################
+###############################
+
+
+###################################
+
+
+if ( m == (67-1) ) {
+
+s19 <- 0
+if (as.POSIXlt(PerfIndex[st1+1+i*tw+pp11])$hour == 16) {s19 <- 4}
+if (as.POSIXlt(PerfIndex[st1+1+i*tw+pp11])$hour == 09) {s19 <- 4*18}
+
+s20 <- 0
+if (as.POSIXlt(PerfIndex[st1+1+i*tw+w1*pp11-1])$hour == 16) {s20 <- 4}
+if (as.POSIXlt(PerfIndex[st1+1+i*tw+w1*pp11-1])$hour == 09) {s20 <- 4*18}
+
+if (z == 0) {
+d2 <- Frame[,y][Frame[,y] != 0][PerfIndex[(st1+1+i*tw+pp11):(st1+1+i*tw+(67)*pp11-2)]]
+if (length(d2) == 0) {
+VVVW <- drop_element(VVVW, y)}} else {
+d2 <- Frame[,y][Frame[,y] != 0][PerfIndex[(st1+1+i*tw+(67-1)*z*pp11):(st1+1+i*tw+(67-1)*(z+1)*pp11-1)]]
+if (length(d2) == 0) {
+VVVW <- drop_element(VVVW, y)
+}}
+
+d2 <- Frame[,y][Frame[,y] != 0]
+
+
+
+if (length(d2) > 0 && unclass(d2[nrow(d2)]) == 1) {Frame[PerfIndex[st1+1+i*tw+67*pp11-1-s20], y == colnames(Frame)] <- -1 }
+} else {
+if ( m == (67*2-1) ) {
+if (z == 0) {
+d2 <- Frame[,y][Frame[,y] != 0][PerfIndex[(st1+1+i*tw+pp11):(st1+1+i*tw+67*pp11-1)]]
+if (length(d2) == 0) {
+VVVW <- drop_element(VVVW, y)}} else {
+d2 <- Frame[,y][Frame[,y] != 0][PerfIndex[(st1+1+i*tw+67*z*pp11):(st1+1+i*tw+(67*(z+1)-1)*pp11-1)]]
+if (length(d2) == 0) {
+VVVW <- drop_element(VVVW, y)
+}}
+
+d2 <- Frame[,y][Frame[,y] != 0]
+
+s20 <- 0
+if (as.POSIXlt(PerfIndex[st1+1+i*tw+w1*2*pp11-1])$hour == 16 && i == 1) {s20 <- 4}
+if (as.POSIXlt(PerfIndex[st1+1+i*tw+w1*2*pp11-1])$hour == 09) {s20 <- 4*18}
+
+if (length(d2) > 0 && unclass(d2[nrow(d2)]) == 1) {Frame[PerfIndex[st1+1+i*tw+67*2*pp11-1-s20], y == colnames(Frame)] <- -1 }
+} else {
+if (m == (floor(tw/pp11)-1)) {
+if (z == 0) {
+d2 <- Frame[,y][Frame[,y] != 0][PerfIndex[(st1+1+i*tw+pp11):(st1+1+i*tw+67*pp11-1)]]
+if (length(d2) == 0) {
+VVVW <- drop_element(VVVW, y)}} else {
+d2 <- Frame[,y][Frame[,y] != 0][PerfIndex[(st1+1+i*tw+67*z*pp11):(st1+1+i*tw+m*pp11-1)]]
+if (length(d2) == 0) {
+VVVW <- drop_element(VVVW, y)
+}}
+
+d2 <- Frame[,y][Frame[,y] != 0]
+
+s20 <- 0
+if (as.POSIXlt(PerfIndex[st1+1+i*tw+floor(tw/pp11)*pp11-1])$hour == 16) {s20 <- 4}
+if (as.POSIXlt(PerfIndex[st1+1+i*tw+floor(tw/pp11)*pp11-1])$hour == 09) {s20 <- 4*18}
+
+if (length(d2) > 0 && unclass(d2[nrow(d2)]) == 1) {Frame[PerfIndex[st1+1+i*tw+floor(tw/pp11)*pp11-1-s20], y == colnames(Frame)] <- -1 }
+}
+}
+}
+
+
+}   ###end of the loop   for (y in SymbolsUUU)
+
+
+
+
+###################################################################################################################
+###################################################################################################################
+
+#Now we buy and sell assets acording to signals written in Frame.
+
+CashStat <- vector(mode = "character", length = 0)  #Returns statistics will be here.
+SymbolsTT <- vector(mode = "character", length = 0)  #A list of assets.
+for (k in 1:length(VVVW)) {SymbolsTT <- append(SymbolsTT, paste(strsplit(VVVW[k], ";")[[1]][1],";",strsplit(VVVW[k], ";")[[1]][2]))}
+SymbolsTT <- unique(SymbolsTT)
+
+initial_funds <- 100000
+
+Totalcash <- 0
+
+tc <- 0.006
+#tc <- 0.003
+
+for (jj in SymbolsTT) {
+
+period_starts <- as.POSIXct(strsplit(jj, ";")[[1]][1])
+period_ends <- as.POSIXct(strsplit(jj, ";")[[1]][2])
+SymbolsT <- vector(mode = "character", length = 0)
+for (k in 1:length(VVVW)) { if (as.POSIXct(strsplit(VVVW[k], ";")[[1]][1]) == period_starts) {
+SymbolsT <- append(SymbolsT, strsplit(VVVW[k], ";")[[1]][3])}
+}
+Totalcash <- 0
+
+
+
+for (s in SymbolsT) {
+
+
+
+initial_fund <- initial_funds/length(SymbolsT)
+
+Signal <- Frame[,s][Frame[,s] != 0][paste(period_starts, period_ends, sep = "::")]
+
+#Signal xts object should contain only appropeiate signals that span period_starts and period_ends.
+#If the same symbols are chosen for two different periods, then there would be an error "number of items to replace is not a multiple of replacement length" since out of range indexes are used.
+
+XX <- eval(parse(text = s))
+
+XX <- Cl(XX)
+names(XX) <- "Price"
+XX <- XX[paste(period_starts, period_ends, sep = "::")]
+
+
+XX$Signals <- XX$Shares_owned <- XX$Cash_in_the_assets <- XX$Shares_bought_or_sold <- XX$Total_cash <- XX$Cash_at_disposal <- XX$Orders <- 0
+
+XX$Signals[index(Signal)] <- Signal
+XX$Orders <- 2*XX$Signals
+
+
+
+for (i in 1:nrow(XX)) {if (XX$Signals[i] == 1) {
+nn <- i
+break}
+}
+
+XX$Shares_bought_or_sold[nn] <- (initial_fund - (initial_fund/unclass(XX$Price[nn]))*tc)/unclass(XX$Price[nn])
+XX$Shares_owned[nn] <- XX$Shares_bought_or_sold[nn]
+XX$Cash_at_disposal[nn+1] <- 0
+XX$Cash_in_the_assets[nn] <- unclass(XX$Shares_bought_or_sold[nn])*unclass(XX$Price[nn])
+XX$Total_cash[nn] <- unclass(XX$Cash_at_disposal[nn]) + unclass(XX$Cash_in_the_assets[nn])
+
+
+#Signals 1, -9, 2 are signals to buy, while signals -11, -2 are signals to sell. Signals 9, 0, 11 mean that no actions needed.
+
+for (i in (nn+1):(nrow(XX$Price)-1)) {
+if (XX$Orders[i] == -2 | XX$Orders[i] == -11) { 
+XX$Shares_bought_or_sold[i] <- -XX$Shares_owned[i-1]
+XX$Cash_at_disposal[i+1] <- (-1*unclass(XX$Shares_bought_or_sold[i])*unclass(XX$Price[i]) - abs(unclass(XX$Shares_bought_or_sold[i]))*tc)
+XX$Shares_owned[i+1] <- 0
+XX$Cash_in_the_assets[i] <- -unclass(XX$Shares_bought_or_sold[i])*unclass(XX$Price[i])
+XX$Cash_in_the_assets[i+1] <- 0
+XX$Total_cash[i] <- unclass(XX$Cash_at_disposal[i]) + unclass(XX$Cash_in_the_assets[i])
+XX$Total_cash[i+1] <- unclass(XX$Cash_at_disposal[i+1]) + unclass(XX$Cash_in_the_assets[i+1])
+} else {
+if (XX$Orders[i] == 2 | XX$Orders[i] == -9 | XX$Orders[i] == 1) { if ( (i > 2) && XX$Cash_at_disposal[i] == 0) {
+XX$Shares_bought_or_sold[i] <- 0
+XX$Shares_owned[i] <- XX$Shares_owned[i-1]
+XX$Cash_at_disposal[i] <- XX$Cash_at_disposal[i-1]
+XX$Cash_at_disposal[i+1] <- XX$Cash_at_disposal[i]
+XX$Cash_in_the_assets[i] <- unclass(XX$Shares_owned[i])*unclass(XX$Price[i])
+XX$Total_cash[i] <- unclass(XX$Cash_at_disposal[i]) + unclass(XX$Cash_in_the_assets[i])
+} else {
+XX$Shares_bought_or_sold[i] <- ( unclass(XX$Cash_at_disposal[i]) - unclass(XX$Cash_at_disposal[i])*tc/unclass(XX$Price[i]) )/unclass(XX$Price[i])
+XX$Cash_at_disposal[i+1] <- 0
+XX$Cash_in_the_assets[i] <- 0
+XX$Shares_owned[i] <- XX$Shares_bought_or_sold[i]
+XX$Shares_owned[i+1] <- XX$Shares_bought_or_sold[i]
+XX$Cash_in_the_assets[i+1] <- unclass(XX$Shares_owned[i])*unclass(XX$Price[i+1])
+XX$Total_cash[i] <- unclass(XX$Cash_at_disposal[i]) + unclass(XX$Cash_in_the_assets[i])
+}
+} else {
+if ((XX$Orders[i] == 0 | XX$Orders[i] == 9 | XX$Orders[i] == 11) && (XX$Orders[i-1] == 2 | XX$Orders[i-1] == -9 | XX$Orders[i-1] == 1)) { if (XX$Shares_bought_or_sold[i-1] > 0) {XX$Cash_at_disposal[i] <- 0
+XX$Shares_bought_or_sold[i] <- 0
+XX$Shares_owned[i] <- XX$Shares_bought_or_sold[i-1]
+XX$Cash_in_the_assets[i] <- unclass(XX$Shares_owned[i])*unclass(XX$Price[i])
+XX$Total_cash[i] <- unclass(XX$Cash_at_disposal[i]) + unclass(XX$Cash_in_the_assets[i])} else {
+XX$Shares_owned[i] <- XX$Shares_owned[i-1]
+XX$Cash_in_the_assets[i] <- unclass(XX$Shares_owned[i])*unclass(XX$Price[i])
+XX$Cash_at_disposal[i] <- XX$Cash_at_disposal[i-1]
+XX$Total_cash[i] <- unclass(XX$Cash_at_disposal[i]) + unclass(XX$Cash_in_the_assets[i])
+}
+} else {
+if ((XX$Orders[i] == 0 | XX$Orders[i] == 9 | XX$Orders[i] == 11) && (XX$Orders[i-1] != -2 && XX$Orders[i-1] != 2)) {
+XX$Shares_bought_or_sold[i] <- 0
+XX$Shares_owned[i] <- XX$Shares_owned[i-1]
+XX$Cash_at_disposal[i] <- XX$Cash_at_disposal[i-1]
+XX$Cash_at_disposal[i+1] <- XX$Cash_at_disposal[i]
+XX$Cash_in_the_assets[i] <- unclass(XX$Shares_owned[i])*unclass(XX$Price[i])
+XX$Total_cash[i] <- unclass(XX$Cash_at_disposal[i]) + unclass(XX$Cash_in_the_assets[i])} 
+
+else {
+if ((XX$Orders[i] == 0 | XX$Orders[i] == 9 | XX$Orders[i] == 11) && (XX$Orders[i-1] == -2)) {
+XX$Shares_bought_or_sold[i] <- 0
+XX$Cash_at_disposal[i+1] <- XX$Cash_at_disposal[i]
+
+}
+
+
+
+}
+
+
+}
+}
+
+}
+}
+
+
+if (XX$Orders[nrow(XX)] == -2 | XX$Orders[nrow(XX)] == -11) { 
+XX$Shares_bought_or_sold[nrow(XX)] <- -XX$Shares_owned[nrow(XX)-1]
+XX$Cash_at_disposal[nrow(XX)] <- (-1*unclass(XX$Shares_bought_or_sold[nrow(XX)])*unclass(XX$Price[nrow(XX)]) - abs(unclass(XX$Shares_bought_or_sold[nrow(XX)]))*tc)
+
+XX$Cash_in_the_assets[nrow(XX)] <- 0
+
+XX$Total_cash[nrow(XX)] <- unclass(XX$Cash_at_disposal[nrow(XX)]) + unclass(XX$Cash_in_the_assets[nrow(XX)])
+
+} else {
+if (XX$Orders[nrow(XX)] == 2 | XX$Orders[nrow(XX)] == -9 | XX$Orders[nrow(XX)] == 1) {
+XX$Shares_bought_or_sold[nrow(XX)] <- 0
+XX$Shares_owned[nrow(XX)] <- XX$Shares_owned[nrow(XX)-1]
+XX$Cash_at_disposal[nrow(XX)] <- XX$Cash_at_disposal[nrow(XX)-1]
+
+XX$Cash_in_the_assets[nrow(XX)] <- unclass(XX$Shares_owned[nrow(XX)])*unclass(XX$Price[nrow(XX)])
+XX$Total_cash[nrow(XX)] <- unclass(XX$Cash_at_disposal[nrow(XX)]) + unclass(XX$Cash_in_the_assets[nrow(XX)])
+}
+}
+
+Totalcash <- Totalcash + unclass(XX$Cash_at_disposal[nrow(XX)]) - initial_fund
+
+
+}   #end of the loop    for (s in SymbolsT)
+
+initial_funds <- Totalcash + initial_funds
+CashStat <- append(CashStat, paste(Totalcash, ";", period_starts, ";", period_ends))
+
+}    #end of the loop    for (jj in SymbolsTT)
